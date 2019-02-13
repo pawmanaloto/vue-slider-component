@@ -28,6 +28,9 @@
           @mousedown="moveStart($event, 0)"
           @touchstart="moveStart($event, 0)"
         >
+          <div class="stepps-slider-tooltip stepps-slider-tooltip-min">
+            {{ dotLabelMin }}
+          </div>
           <div ref="tooltip0" :class="['vue-slider-tooltip-' + tooltipDirection[0], 'vue-slider-tooltip-wrap']">
             <slot name="tooltip" :value="val[0]" :index="0" :disabled="!boolDisabled && disabledArray[0]">
               <span class="vue-slider-tooltip" :style="tooltipStyles[0]">{{ formatter ? formatting(val[0]) : val[0] }}</span>
@@ -54,6 +57,9 @@
           @mousedown="moveStart($event, 1)"
           @touchstart="moveStart($event, 1)"
         >
+          <div class="stepps-slider-tooltip stepps-slider-tooltip-max">
+            {{ dotLabelMax }}
+          </div>
           <div ref="tooltip1" :class="['vue-slider-tooltip-' + tooltipDirection[1], 'vue-slider-tooltip-wrap']">
             <slot name="tooltip" :value="val[1]" :index="1" :disabled="!boolDisabled && disabledArray[1]">
               <span class="vue-slider-tooltip" :style="tooltipStyles[1]">{{ formatter ? formatting(val[1]) : val[1] }}</span>
@@ -253,6 +259,18 @@
         type: Boolean,
         default: false
       },
+      showMinAndMaxLabel: {
+        type: Boolean,
+        default: true
+      },
+      minAndMax: {
+        type: Boolean,
+        default: true
+      },
+      minAndMaxLabel: {
+        type: Array,
+        default: ()=> ['Min', 'Max']
+      },
       processDragable: {
         type: Boolean,
         default: false
@@ -303,6 +321,26 @@
       }
     },
     computed: {
+      dotLabelMin () {
+        if (!this.showMinAndMaxLabel) {
+          return ''
+        }
+
+        if (this.minAndMax && this.val[0] === this.min) {
+          return this.minAndMaxLabel[0]
+        }
+        return this.formatter ? this.formatting(this.val[0]) : this.val[0]
+      },
+      dotLabelMax () {
+        if (!this.showMinAndMaxLabel) {
+          return ''
+        }
+
+        if (this.minAndMax && this.val[1] === this.max) {
+          return this.minAndMaxLabel[1]
+        }
+        return this.formatter ? this.formatting(this.val[1]) : this.val[1]
+      },
       dotWidthVal () {
         return typeof this.dotWidth === 'number' ? this.dotWidth : this.dotSize
       },
@@ -995,6 +1033,8 @@
 
           const tooltip0Right = tooltip0.getBoundingClientRect().right
           const tooltip1Left = tooltip1.getBoundingClientRect().left
+
+          //console.log(tooltip1Left, tooltip0Right)
 
           const tooltip0Y = tooltip0.getBoundingClientRect().y
           const tooltip1Y = tooltip1.getBoundingClientRect().y + tooltip1.getBoundingClientRect().height
